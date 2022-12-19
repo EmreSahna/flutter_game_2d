@@ -10,8 +10,8 @@ class DefaultSettings {
   String username = "Maceraci";
   int stages = 10;
   Difficulty difficulty = Difficulty.easy;
-  GameObject character = Knight(50, 10);
-  Enemy enemy = Enemy(10, 5);
+  GameObject character = Knight(50, 3);
+  Enemy enemy = Enemy(10, 2);
 }
 
 abstract class GameObject{

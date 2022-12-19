@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'initalize.dart';
+import 'dart:math';
 
 class Game extends StatefulWidget{
   const Game({super.key});
@@ -8,16 +9,18 @@ class Game extends StatefulWidget{
 }
 
 class _GameScreenState extends State<Game>{
+  var currentStage = 1;
+  bool isGameEnded = true;
+  bool isGameEndedWithWon = true;
 
   @override
   Widget build(BuildContext context) {
     final double _width = MediaQuery.of(context).size.width;
     final double _height = MediaQuery.of(context).size.height;
     var defaultSettings = ModalRoute.of(context)!.settings.arguments as DefaultSettings;
-    var currentStage = 1;
 
     bool checkStage(){
-      return defaultSettings.stages <= currentStage ? true : false;
+      return defaultSettings.stages < currentStage ? true : false;
     }
 
     bool checkCharacter(){
@@ -28,36 +31,61 @@ class _GameScreenState extends State<Game>{
       return defaultSettings.enemy.health! > 0 ? true : false;
     }
 
-    void gameLogic(){
-      if(checkCharacter()){
-        if(checkMob()){
-          print('mob alive');
-        }else{
-          print('you kill mob');
+    void gameLogic1(){
+      setState(() {
+        defaultSettings.enemy.health = defaultSettings.enemy.health! - defaultSettings.character.damage!;
+      });
+      if(!checkMob()){
+        setState(() {
           defaultSettings.enemy.health = 10;
-          if(checkStage()){
-            print('finished game');
-          }else{
-            print('still playing');
-          }
+          currentStage = currentStage + 1;
+        });
+        if(checkStage()){
+          setState(() {
+            isGameEnded = false;
+            isGameEndedWithWon = true;
+          });
         }
-      }else{
-        print('reset game');
       }
     }
 
-    void doAttack(){
-      defaultSettings.enemy.health = defaultSettings.enemy.health! - defaultSettings.character.damage!;
-      gameLogic();
+    void gameLogic2(){
+      if(Random().nextInt(2) == 1){
+        setState(() {
+          defaultSettings.character.health = defaultSettings.character.health! - (defaultSettings.enemy.damage! + defaultSettings.difficulty.index);        
+        });
+      }else{
+        setState(() {
+          defaultSettings.enemy.health = defaultSettings.enemy.health! + (defaultSettings.enemy.damage! + defaultSettings.difficulty.index);        
+        });
+      }
+      if(!checkCharacter()){
+        setState(() {
+          isGameEnded = false;
+          isGameEndedWithWon = false;
+        });
+      }
+    }
+
+    void gameLogic3(){
       setState(() {
-        currentStage = currentStage + 1;      
-        print(currentStage);
+        defaultSettings.character.health = defaultSettings.character.health! + defaultSettings.character.damage!;
       });
+    }
+
+    void doAttack(){
+      gameLogic1();
+      gameLogic2();
+    }
+
+    void doHeal(){
+      gameLogic3();
+      gameLogic2();
     }
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
+      body: isGameEnded ? Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
@@ -139,7 +167,7 @@ class _GameScreenState extends State<Game>{
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 GestureDetector(
-                  onTap: () {
+                  onTap: () {                  
                     doAttack();
                   },
                   child: Container(
@@ -156,6 +184,7 @@ class _GameScreenState extends State<Game>{
                 GestureDetector(
                   onTap: () {
                     setState(() {
+                      doHeal();
                     });
                   },
                   child: Container(
@@ -172,7 +201,38 @@ class _GameScreenState extends State<Game>{
             ),
           )  
         ],
-      ),
+      ) 
+      : 
+      Center(
+        child: ( Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              isGameEndedWithWon ? const Text('You Won!', style: TextStyle(color: Colors.amber, fontSize: 55)) : const Text('You Lose!', style: TextStyle(color: Colors.amber, fontSize: 55)),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  textStyle: MaterialStateProperty.all(
+                    const TextStyle(fontSize: 30,fontFamily: 'Jost'),
+                  ),
+                ),
+                onPressed: () {
+                  if(defaultSettings.character.getClass() == 'Knight'){
+                    defaultSettings.character = Knight(50, 3);
+                  }else{
+                    defaultSettings.character = Elf(45, 4);
+                  }
+                  setState(() {
+                    defaultSettings.enemy.health = 10;
+                  });
+                  Navigator.pop(context);
+                }, 
+                child: const Text('Main Menu'),
+              ),
+            ]
+          )
+        ),
+      ) 
     );
   }
 }

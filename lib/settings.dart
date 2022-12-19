@@ -15,8 +15,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     var defaultSettings = ModalRoute.of(context)!.settings.arguments as DefaultSettings;
     bool isKnightSelected = defaultSettings.character.getClass() == "Knight" ? true : false;
-    Knight p1 = Knight(50, 10);
-    Elf p2 = Elf(40, 15);
+    Knight p1 = Knight(50, 3);
+    Elf p2 = Elf(40, 4);
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
