@@ -1,5 +1,3 @@
-import 'dart:math';
-
 enum Difficulty {
   easy,
   normal,
@@ -19,24 +17,11 @@ abstract class GameObject{
   int? damage;
   String imagePath();
   GameObject(this.health, this.damage);
-  int hit();
-  int heal();
   String getClass();
 }
 
 class Elf extends GameObject{
   Elf(super.health, super.damage);
-  
-  @override
-  int heal() {
-    int heal = health!~/3;
-    return Random().nextInt(heal+1); 
-  }
-  
-  @override
-  int hit() {
-    return Random().nextInt(15) + (damage!);
-  }
 
   @override 
   String getClass(){
@@ -51,17 +36,6 @@ class Elf extends GameObject{
 
 class Knight extends GameObject{
   Knight(super.health, super.damage);
-  
-  @override
-  int heal() {
-    int heal = health!~/3;
-    return Random().nextInt(heal+1);  
-  }
-  
-  @override
-  int hit() {
-    return Random().nextInt(5) + (damage!);
-  }
 
   @override 
   String getClass(){
@@ -76,22 +50,6 @@ class Knight extends GameObject{
 
 class Enemy extends GameObject{
   Enemy(super.health, super.damage);
-
-  @override
-  set health(int? _health) {
-    super.health = _health;
-  }
-
-  @override
-  int heal() {
-    int heal = health!~/3;
-    return Random().nextInt(heal+1); 
-  }
-
-  @override
-  int hit() {
-    return Random().nextInt(10) + (damage!);
-  }
 
   @override 
   String getClass(){
